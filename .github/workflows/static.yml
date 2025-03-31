@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>计价器</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-weight: 500;
+        }
+        input {
+            width: 95%;
+            padding: 10px;
+            border: 2px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 18px;
+            color: #2c3e50;
+        }
+        .note {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .highlight {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>论文降重计价器</h1>
+        
+        <div class="input-group">
+            <label>当前查重率/AI率（%）</label>
+            <input type="text" id="currentRate" placeholder="例如：22.13">
+        </div>
+
+        <div class="input-group">
+            <label>目标查重率/AI率（%）</label>
+            <input type="text" id="targetRate" placeholder="例如：5">
+        </div>
+
+        <div class="input-group">
+            <label>论文总字符数</label>
+            <input type="number" id="totalChars" placeholder="例如：22598">
+        </div>
+
+        <button onclick="calculatePrice()">立即计算</button>
+
+        <div id="result">等待计算...</div>
+        <div class="note">* 百分比符号（%）可输入可不输入，支持小数输入</div>
+    </div>
+
+    <script>
+        function calculatePrice() {
+            try {
+                // 获取并验证输入
+                const current = document.getElementById('currentRate').value.replace('%', '');
+                const target = document.getElementById('targetRate').value.replace('%', '');
+                const chars = document.getElementById('totalChars').value;
+
+                if (!current || !target || !chars) {
+                    throw new Error('请填写所有输入项');
+                }
+
+                // 转换为数值
+                const currentRate = parseFloat(current);
+                const targetRate = parseFloat(target);
+                const totalChars = parseInt(chars);
+
+                // 验证数值有效性
+                if (isNaN(currentRate) || isNaN(targetRate) || isNaN(totalChars)) {
+                    throw new Error('请输入有效的数字');
+                }
+                if (targetRate >= currentRate) {
+                    throw new Error('目标率必须小于当前率');
+                }
+
+                // 计算逻辑
+                const rateDiff = (currentRate - targetRate) / 100;
+                const price = Math.round( (rateDiff * totalChars / 1000) * 15 );
+
+                // 显示结果
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = `预估费用：<span class="highlight">${price} 元</span>`;
+                resultDiv.style.backgroundColor = '#e8f4ff';
+
+            } catch (error) {
+                document.getElementById('result').innerHTML = 
+                    `<span style="color: #e74c3c">错误：${error.message}</span>`;
+                document.getElementById('result').style.backgroundColor = '#ffe8e8';
+            }
+        }
+    </script>
+</body>
+</html>
